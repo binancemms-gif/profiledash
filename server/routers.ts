@@ -2,6 +2,8 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { z } from "zod";
+import { createAgentTask, listAgentTasks, updateAgentTask } from "./db";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -17,12 +19,11 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  agent: router({
+    tasks: publicProcedure.query(() => listAgentTasks()),
+    createTask: publicProcedure.input(z.object({ title: z.string().min(1).max(200), description: z.string().max(1000).optional(), owner: z.string().max(80).optional(), priority: z.enum(["Low", "Medium", "High"]).optional(), area: z.string().max(64).optional(), approvalRequired: z.boolean().optional() })).mutation(({ input }) => createAgentTask({ ...input, approvalRequired: input.approvalRequired ? 1 : 0 })),
+    updateTask: publicProcedure.input(z.object({ id: z.number().int().positive(), status: z.string().max(32), retryCount: z.number().int().min(0).optional() })).mutation(({ input }) => updateAgentTask(input.id, input.status, input.retryCount)),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
