@@ -1,4 +1,4 @@
 
-## Command chatbox update
+## Daily summary report update
 
-The YouTube Agent includes a command chatbox with plain-language trigger parsing for scanning comments, staging high-intent replies, and creating follow-up tasks. It keeps a short conversation history, offers one-tap command suggestions, reports bridge or in-progress blockers, and routes public replies through the existing approval gate.
+Add a scheduled daily-summary panel to the YouTube Agent. It combines staged reply counts, rule-match counts, campaign profile views, campaign spend, and conversions; supports Generate now, text export, recent report receipts, and pause/enable schedule controls. In the current static app, the schedule is explicitly labeled as preview-only until the OpenClaw Gateway bridge is connected for real unattended delivery.
