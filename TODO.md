@@ -1,8 +1,8 @@
 
-## Automated daily summary report
+## Firecrawl YouTube page and comment sync
 
-- [x] Combine staged YouTube reply activity and campaign metrics in a daily summary panel.
-- [x] Show staged replies, rule matches, campaign views, spend, conversions, last generated time, and next run.
-- [x] Support Generate now, plain-text export, recent report receipts, and pause/enable schedule controls.
-- [x] Support a command-box trigger for generating the daily summary.
-- [x] Make preview-only scheduling explicit until the authenticated OpenClaw Gateway bridge is connected.
+- [x] Crawl a public YouTube performance-marketing page through the configured Firecrawl connector.
+- [x] Fetch page metadata and top-level public comments through the YouTube provider.
+- [x] Show the crawled source URL, channel, view count, public comment count, and crawl freshness in ProfileDash.
+- [x] Import normalized Firecrawl comments into the existing rule-based filter and human approval queue.
+- [x] Keep connector credentials out of the browser and label the current snapshot as preview-safe until live server-side scheduling is configured.

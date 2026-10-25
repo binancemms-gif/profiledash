@@ -605,3 +605,19 @@ h1 { max-width: 760px; margin-top: 9px; color: var(--ink); font-family: Georgia,
   .daily-summary-foot { align-items: flex-start; flex-direction: column; }
   .summary-actions { justify-content: flex-start; }
 }
+
+.firecrawl-source-box { margin-top: 11px; padding: 12px; border: 1px solid rgba(108,168,255,.22); border-radius: 10px; background: linear-gradient(135deg, rgba(64,130,220,.12), rgba(255,255,255,.03)); }
+.firecrawl-source-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.firecrawl-source-head > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.firecrawl-source-head b { color: #e4efff; font-size: 10px; }
+.firecrawl-source-body { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 9px; }
+.firecrawl-source-copy { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.firecrawl-source-copy a { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; overflow: hidden; color: #c3d9ff; font-size: 10px; font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.firecrawl-source-copy a:hover { color: #fff; }
+.firecrawl-source-copy span, .firecrawl-source-copy small { color: #8e98a9; font-size: 8px; }
+.firecrawl-source-body .button { flex: 0 0 auto; }
+@media (max-width: 760px) {
+  .firecrawl-source-head { align-items: flex-start; flex-direction: column; }
+  .firecrawl-source-body { align-items: flex-start; flex-direction: column; }
+  .firecrawl-source-body .button { width: 100%; }
+}
