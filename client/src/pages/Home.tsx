@@ -183,9 +183,9 @@ const funnelData = [
 ];
 
 const initialTasks = [
-  { id: 1, title: "Review Founder Notes creative set", owner: "Maya", due: "Today", priority: "High", status: "In progress", area: "Campaigns" },
+  { id: 1, title: "Review Founder Notes creative set", owner: "Maya", due: "Today", priority: "High", status: "In progress", area: "Content workflow" },
   { id: 2, title: "Reply to 12 high-intent YouTube comments", owner: "YouTube agent", due: "Today", priority: "High", status: "Todo", area: "YouTube" },
-  { id: 3, title: "Confirm Community Week launch budget", owner: "Amir", due: "Oct 26", priority: "Medium", status: "Todo", area: "Campaigns" },
+  { id: 3, title: "Confirm Community Week launch budget", owner: "Amir", due: "Oct 26", priority: "Medium", status: "Todo", area: "Content workflow" },
   { id: 4, title: "Export weekly profile-view report", owner: "Noah", due: "Oct 27", priority: "Low", status: "Done", area: "Profile views" },
   { id: 5, title: "Tag returning visitors in CRM", owner: "Maya", due: "Oct 28", priority: "Medium", status: "In progress", area: "Profile views" },
   { id: 6, title: "Refresh reply tone guidelines", owner: "Noah", due: "Oct 30", priority: "Low", status: "Todo", area: "YouTube" },
@@ -238,9 +238,11 @@ const defaultReplyRules = {
 };
 
 const workspaceItems = [
-  { slug: "overview", label: "Profile views", sub: "Growth cockpit", icon: LayoutDashboard },
-  { slug: "tasks", label: "Tasks", sub: "Keep the signal moving", icon: ListChecks },
-  { slug: "youtube-agent", label: "YouTube agent", sub: "Reply with intent", icon: Youtube },
+  { slug: "overview", label: "Channel cockpit", sub: "Live YouTube signal", icon: LayoutDashboard },
+  { slug: "tasks", label: "Agent tasks", sub: "Plan and approve work", icon: ListChecks },
+  { slug: "youtube-agent", label: "Comments", sub: "Reply with intent", icon: MessageCircle },
+  { slug: "content", label: "Content queue", sub: "Turn signal into videos", icon: Sparkles },
+  { slug: "analytics", label: "Performance", sub: "Measure what moves", icon: TrendingUp },
 ];
 
 const number = new Intl.NumberFormat("en-US");
@@ -312,7 +314,7 @@ function Sidebar({ current, onNavigate }: { current: string; onNavigate: (slug: 
         <div className="brand-mark"><span /><span /><span /></div>
         <div><div className="brand-name">signal <span>/</span> room</div><div className="brand-caption">Growth operations</div></div>
       </div>
-      <div className="sidebar-label">Workspace</div>
+      <div className="sidebar-label">YouTube workspace</div>
       <nav className="sidebar-nav" aria-label="Workspace navigation">
         {workspaceItems.map(({ slug, label, sub, icon: Icon }) => (
           <button key={slug} className={`nav-item ${current === slug ? "active" : ""}`} onClick={() => onNavigate(slug)}>
@@ -326,7 +328,7 @@ function Sidebar({ current, onNavigate }: { current: string; onNavigate: (slug: 
       <div className="sidebar-live-card">
         <div className="live-card-head"><span className="live-dot" /> Live data <span>↗</span></div>
         <p>Sources are synced and ready for the next decision.</p>
-        <div className="sync-row"><span>5 sources</span><b>99.2%</b></div>
+        <div className="sync-row"><span>YouTube live</span><b>99.2%</b></div>
       </div>
       <button className="sidebar-bottom"><Settings2 size={16} /> Workspace settings</button>
       <div className="sidebar-profile"><div className="avatar avatar-violet">MC</div><div><b>Maya Chen</b><small>Owner</small></div><MoreHorizontal size={17} /></div>
@@ -353,12 +355,12 @@ function Topbar({ onRefresh, onExport, range, setRange, comparison, setCompariso
 function FilterBar({ campaign, setCampaign, channel, setChannel, audience, setAudience, onClear }: { campaign: string; setCampaign: (value: string) => void; channel: string; setChannel: (value: string) => void; audience: string; setAudience: (value: string) => void; onClear: () => void }) {
   return (
     <div className="filter-bar">
-      <div className="filter-label"><Filter size={14} /> Filters</div>
-      <label className="filter-select"><span>Campaign</span><select value={campaign} onChange={(event) => setCampaign(event.target.value)}><option>All campaigns</option>{initialCampaigns.map((item) => <option key={item.id}>{item.name}</option>)}</select><ChevronDown size={13} /></label>
+      <div className="filter-label"><Filter size={14} /> Channel filters</div>
+      <label className="filter-select"><span>Campaign</span><select value={campaign} onChange={(event) => setCampaign(event.target.value)}><option>All videos</option>{initialCampaigns.map((item) => <option key={item.id}>{item.name}</option>)}</select><ChevronDown size={13} /></label>
       <label className="filter-select"><span>Channel</span><select value={channel} onChange={(event) => setChannel(event.target.value)}><option>All channels</option>{channelData.map((item) => <option key={item.name}>{item.name}</option>)}</select><ChevronDown size={13} /></label>
       <label className="filter-select"><span>Audience</span><select value={audience} onChange={(event) => setAudience(event.target.value)}><option>All audiences</option><option>New visitors</option><option>Returning visitors</option><option>High-intent</option></select><ChevronDown size={13} /></label>
       <button className="filter-more"><SlidersIcon /> More filters <span>2</span></button>
-      {(campaign !== "All campaigns" || channel !== "All channels" || audience !== "All audiences") && <button className="clear-filters" onClick={onClear}><X size={13} /> Clear</button>}
+      {(campaign !== "All videos" || channel !== "All channels" || audience !== "All audiences") && <button className="clear-filters" onClick={onClear}><X size={13} /> Clear</button>}
     </div>
   );
 }
@@ -368,16 +370,16 @@ function SlidersIcon() {
 }
 
 function Overview({ onSelectCampaign, campaigns, channel, campaignFilter }: { onSelectCampaign: (id: string) => void; campaigns: typeof initialCampaigns; channel: string; campaignFilter: string }) {
-  const filteredCampaigns = campaigns.filter((item) => (campaignFilter === "All campaigns" || item.name === campaignFilter) && (channel === "All channels" || item.source === channel));
-  const viewMultiplier = campaignFilter === "All campaigns" ? 1 : 0.33;
+  const filteredCampaigns = campaigns.filter((item) => (campaignFilter === "All videos" || item.name === campaignFilter) && (channel === "All channels" || item.source === channel));
+  const viewMultiplier = campaignFilter === "All videos" ? 1 : 0.33;
   const currentViews = Math.round(54920 * viewMultiplier);
   const visitorCount = Math.round(34220 * viewMultiplier);
-  const conversionRate = campaignFilter === "All campaigns" ? "7.8%" : "6.4%";
+  const conversionRate = campaignFilter === "All videos" ? "7.8%" : "6.4%";
 
   return (
     <>
       <div className="page-intro">
-        <div><div className="eyebrow eyebrow-violet">Monday, 25 Oct 2026 <span className="slash">/</span> live workspace</div><h1>Attention is moving in the right direction.</h1><p>Profile discovery is up, and the latest campaigns are turning that attention into action.</p></div>
+        <div><div className="eyebrow eyebrow-violet">Monday, 25 Oct 2026 <span className="slash">/</span> live channel</div><h1>Your YouTube channel has a clear next move.</h1><p>The agent is watching audience signal, organizing the reply queue, and turning recurring questions into your next videos.</p></div>
         <div className="intro-actions"><button className="button button-secondary"><Target size={15} /> Set targets</button><button className="button button-primary"><Sparkles size={15} /> Optimize signal</button></div>
       </div>
       <div className="kpi-grid">
@@ -386,7 +388,7 @@ function Overview({ onSelectCampaign, campaigns, channel, campaignFilter }: { on
         <KpiCard label="View growth rate" value="18.4%" change="+4.2 pts" detail="above target" icon={TrendingUp} color="amber" />
         <KpiCard label="Campaign-attributed" value={formatCompact(Math.round(currentViews * 0.76))} change="+24.7%" detail="76% of total views" icon={Megaphone} color="sky" />
         <KpiCard label="Profile conversion" value={conversionRate} change="+1.3 pts" detail="views → actions" icon={Zap} color="coral" />
-        <KpiCard label="Cost per view" value={campaignFilter === "All campaigns" ? "$0.31" : "$0.27"} change="-14.2%" detail="lower is better" icon={Gauge} color="violet" />
+        <KpiCard label="Cost per view" value={campaignFilter === "All videos" ? "$0.31" : "$0.27"} change="-14.2%" detail="lower is better" icon={Gauge} color="violet" />
       </div>
       <section className="panel trend-panel">
         <SectionHeader eyebrow="Growth signal" title="Profile views are compounding week over week" action={<div className="legend"><span><i className="legend-violet" />Profile views</span><span><i className="legend-mint" />Unique visitors</span><button className="more-button"><MoreHorizontal size={17} /></button></div>} />
@@ -395,7 +397,7 @@ function Overview({ onSelectCampaign, campaigns, channel, campaignFilter }: { on
         <div className="chart-footer"><span><b>New visitors</b> 68%</span><span><b>Returning</b> 32%</span><span><b>Avg. views / visitor</b> 1.6</span><span className="chart-footer-spacer" /><button className="text-button">View detailed report <ChevronRight size={14} /></button></div>
       </section>
       <div className="two-col-layout">
-        <section className="panel campaign-panel"><SectionHeader eyebrow="Campaign pulse" title="Which campaigns are pulling the signal?" action={<button className="text-button" onClick={() => onSelectCampaign(filteredCampaigns[0]?.id ?? campaigns[0].id)}>View all <ChevronRight size={14} /></button>} /><div className="campaign-table"><div className="table-row table-head"><span>Campaign</span><span>Status</span><span>Profile views</span><span>Cost / view</span><span /></div>{filteredCampaigns.slice(0, 4).map((item) => <button className="table-row table-body" key={item.id} onClick={() => onSelectCampaign(item.id)}><span className="campaign-name-cell"><i className={`campaign-dot ${item.color}`} /><span><b>{item.name}</b><small>{item.objective}</small></span></span><span><Pill tone={item.health}>{item.health}</Pill></span><span><b>{formatCompact(item.views || 0)}</b><small>{item.engagement || 0}% engagement</small></span><span><b>{item.cpv ? `$${item.cpv.toFixed(2)}` : "—"}</b><small>{item.source}</small></span><ChevronRight size={16} className="row-arrow" /></button>)}</div><div className="table-summary"><span>Showing {filteredCampaigns.length} campaigns</span><span><span className="summary-dot" /> {filteredCampaigns.filter((item) => item.status === "Active").length} active</span><span className="summary-spacer" /><button className="button-link" onClick={() => onSelectCampaign(filteredCampaigns[0]?.id ?? campaigns[0].id)}>Open campaign table <ExternalLink size={13} /></button></div></section>
+        <section className="panel campaign-panel"><SectionHeader eyebrow="Video pulse" title="Which campaigns are pulling the signal?" action={<button className="text-button" onClick={() => onSelectCampaign(filteredCampaigns[0]?.id ?? campaigns[0].id)}>View all <ChevronRight size={14} /></button>} /><div className="campaign-table"><div className="table-row table-head"><span>Campaign</span><span>Status</span><span>Profile views</span><span>Cost / view</span><span /></div>{filteredCampaigns.slice(0, 4).map((item) => <button className="table-row table-body" key={item.id} onClick={() => onSelectCampaign(item.id)}><span className="campaign-name-cell"><i className={`campaign-dot ${item.color}`} /><span><b>{item.name}</b><small>{item.objective}</small></span></span><span><Pill tone={item.health}>{item.health}</Pill></span><span><b>{formatCompact(item.views || 0)}</b><small>{item.engagement || 0}% engagement</small></span><span><b>{item.cpv ? `$${item.cpv.toFixed(2)}` : "—"}</b><small>{item.source}</small></span><ChevronRight size={16} className="row-arrow" /></button>)}</div><div className="table-summary"><span>Showing {filteredCampaigns.length} campaigns</span><span><span className="summary-dot" /> {filteredCampaigns.filter((item) => item.status === "Active").length} active</span><span className="summary-spacer" /><button className="button-link" onClick={() => onSelectCampaign(filteredCampaigns[0]?.id ?? campaigns[0].id)}>Open campaign table <ExternalLink size={13} /></button></div></section>
         <section className="panel channel-panel"><SectionHeader eyebrow="Attribution" title="Channel efficiency" action={<button className="more-button"><MoreHorizontal size={17} /></button>} /><div className="scatter-wrap"><ResponsiveContainer width="100%" height="100%"><ScatterChart margin={{ top: 12, right: 15, bottom: 4, left: -12 }}><CartesianGrid stroke="#e7e1dc" strokeDasharray="4 5" /><XAxis type="number" dataKey="cpv" name="Cost per view" tick={{ fill: "#a19b94", fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value.toFixed(2)}`} domain={[0, 0.7]} /><YAxis type="number" dataKey="rate" name="Conversion rate" tick={{ fill: "#a19b94", fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}%`} domain={[0, 9]} /><ZAxis type="number" dataKey="views" range={[70, 420]} /><Tooltip cursor={{ strokeDasharray: "3 3" }} content={<ChartTooltip />} /><Scatter data={channelData} name="Channels" fill="#7657f6" /></ScatterChart></ResponsiveContainer></div><div className="efficiency-footer"><div><span>Best efficiency</span><b>Email <small>· $0.08 / view</small></b></div><div><span>Most volume</span><b>Paid social <small>· 24.1K views</small></b></div></div></section>
       </div>
       <div className="three-col-layout"><section className="panel funnel-panel"><SectionHeader eyebrow="Conversion" title="Attention → action" action={<button className="more-button"><MoreHorizontal size={17} /></button>} /><div className="funnel-chart"><ResponsiveContainer width="100%" height="100%"><FunnelChart><Tooltip content={<ChartTooltip />} /><Funnel dataKey="value" data={funnelData} isAnimationActive nameKey="name"><LabelList position="right" fill="#6e6963" stroke="none" dataKey="name" fontSize={11} /></Funnel></FunnelChart></ResponsiveContainer></div><div className="funnel-bottom"><b>7.8%</b><span>profile-view → action rate</span><Pill tone="positive">+1.3 pts</Pill></div></section><section className="panel alerts-panel"><SectionHeader eyebrow="Operator notes" title="Worth your attention" action={<button className="more-button"><MoreHorizontal size={17} /></button>} /><div className="alert-list"><div className="alert-item alert-amber"><span className="alert-icon"><AlertTriangle size={16} /></span><div><b>Summer Proof is over pace</b><p>Spend is 9% above budget with a 0.6 cost per view.</p><button className="button-link" onClick={() => onSelectCampaign("summer-proof")}>Review campaign <ChevronRight size={13} /></button></div></div><div className="alert-item alert-violet"><span className="alert-icon"><Sparkles size={16} /></span><div><b>Founder Notes is gaining lift</b><p>Profile-view rate is up 22% in the last 72 hours.</p><button className="button-link" onClick={() => onSelectCampaign("founder-notes")}>See what changed <ChevronRight size={13} /></button></div></div><div className="alert-item alert-mint"><span className="alert-icon"><CheckCircle2 size={16} /></span><div><b>Tracking is healthy</b><p>All active campaigns have complete attribution parameters.</p></div></div></div></section><section className="panel quick-panel"><SectionHeader eyebrow="Quick actions" title="Keep momentum" /><button className="quick-action"><span className="quick-icon violet"><Plus size={16} /></span><span><b>Plan a campaign</b><small>Start with an outcome</small></span><ChevronRight size={15} /></button><button className="quick-action"><span className="quick-icon mint"><Send size={16} /></span><span><b>Reply to comments</b><small>3 high-intent replies</small></span><ChevronRight size={15} /></button><button className="quick-action"><span className="quick-icon amber"><ListChecks size={16} /></span><span><b>Clear today’s tasks</b><small>2 items need you</small></span><ChevronRight size={15} /></button></section></div>
@@ -613,10 +615,10 @@ function YoutubeAgent({ comments, setComments }: { comments: typeof initialComme
 
 export default function Home() {
   const [location, setLocation] = useLocation();
-  const current = location === "/tasks" ? "tasks" : location === "/youtube-agent" ? "youtube-agent" : "overview";
+  const current = location === "/tasks" ? "tasks" : location === "/youtube-agent" ? "youtube-agent" : location === "/content" ? "content" : location === "/analytics" ? "analytics" : "overview";
   const [range, setRange] = useState("Last 30 days");
   const [comparison, setComparison] = useState("Previous period");
-  const [campaignFilter, setCampaignFilter] = useState("All campaigns");
+  const [campaignFilter, setCampaignFilter] = useState("All videos");
   const [channel, setChannel] = useState("All channels");
   const [audience, setAudience] = useState("All audiences");
   const [campaigns, setCampaigns] = useState(initialCampaigns);
@@ -630,7 +632,7 @@ export default function Home() {
   const selectCampaign = (id: string) => { setSelectedCampaign(id); setShowDetail(true); };
   const refresh = () => toast.success("Signal room refreshed", { description: "Latest activity is now in view." });
   const exportData = () => { const csv = ["Campaign,Status,Profile views,Cost per view,Conversions", ...campaigns.map((item) => `${item.name},${item.status},${item.views},${item.cpv},${item.conversions}`)].join("\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "signal-room-campaigns.csv"; anchor.click(); URL.revokeObjectURL(url); toast.success("CSV exported"); };
-  const clearFilters = () => { setCampaignFilter("All campaigns"); setChannel("All channels"); setAudience("All audiences"); };
+  const clearFilters = () => { setCampaignFilter("All videos"); setChannel("All channels"); setAudience("All audiences"); };
 
-  return <div className="app-shell"><Sidebar current={current} onNavigate={navigate} /><main className="main-shell"><Topbar onRefresh={refresh} onExport={exportData} range={range} setRange={setRange} comparison={comparison} setComparison={setComparison} /><div className="mobile-workspace-nav">{workspaceItems.map(({ slug, label, icon: Icon }) => <button key={slug} className={current === slug ? "active" : ""} onClick={() => navigate(slug)}><Icon size={15} /> {label}</button>)}</div><div className="page-content">{current === "overview" && <><div className="filter-bar-wrap"><FilterBar campaign={campaignFilter} setCampaign={setCampaignFilter} channel={channel} setChannel={setChannel} audience={audience} setAudience={setAudience} onClear={clearFilters} /></div><Overview onSelectCampaign={selectCampaign} campaigns={campaigns} channel={channel} campaignFilter={campaignFilter} /></>}{current === "tasks" && <Tasks tasks={tasks} setTasks={setTasks} />}{current === "youtube-agent" && <YoutubeAgent comments={comments} setComments={setComments} />}</div></main>{showDetail && selectedCampaignData && <div className="modal-backdrop" onClick={() => setShowDetail(false)}><div className="modal-sheet" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowDetail(false)}><X size={18} /></button><CampaignDetail campaign={selectedCampaignData} /></div></div>}</div>;
+  return <div className="app-shell"><Sidebar current={current} onNavigate={navigate} /><main className="main-shell"><Topbar onRefresh={refresh} onExport={exportData} range={range} setRange={setRange} comparison={comparison} setComparison={setComparison} /><div className="mobile-workspace-nav">{workspaceItems.map(({ slug, label, icon: Icon }) => <button key={slug} className={current === slug ? "active" : ""} onClick={() => navigate(slug)}><Icon size={15} /> {label}</button>)}</div><div className="page-content">{current === "overview" && <><div className="filter-bar-wrap"><FilterBar campaign={campaignFilter} setCampaign={setCampaignFilter} channel={channel} setChannel={setChannel} audience={audience} setAudience={setAudience} onClear={clearFilters} /></div><Overview onSelectCampaign={selectCampaign} campaigns={campaigns} channel={channel} campaignFilter={campaignFilter} /></>}{current === "tasks" && <Tasks tasks={tasks} setTasks={setTasks} />}{(current === "youtube-agent" || current === "content" || current === "analytics") && <YoutubeAgent comments={comments} setComments={setComments} />}</div></main>{showDetail && selectedCampaignData && <div className="modal-backdrop" onClick={() => setShowDetail(false)}><div className="modal-sheet" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowDetail(false)}><X size={18} /></button><CampaignDetail campaign={selectedCampaignData} /></div></div>}</div>;
 }
