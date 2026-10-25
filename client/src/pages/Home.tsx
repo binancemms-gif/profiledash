@@ -340,11 +340,11 @@ function Sidebar({ current, onNavigate }: { current: string; onNavigate: (slug: 
   );
 }
 
-function Topbar({ onRefresh, onExport, range, setRange, comparison, setComparison }: { onRefresh: () => void; onExport: () => void; range: string; setRange: (value: string) => void; comparison: string; setComparison: (value: string) => void }) {
+function Topbar({ onRefresh, onExport, range, setRange, comparison, setComparison, syncState }: { onRefresh: () => void; onExport: () => void; range: string; setRange: (value: string) => void; comparison: string; setComparison: (value: string) => void; syncState: "syncing" | "ready" | "error" }) {
   return (
     <header className="topbar">
       <div className="mobile-brand"><div className="brand-mark"><span /><span /><span /></div><span>Summer workspace</span></div>
-      <div className="topbar-left"><span className="live-dot" /> <span>Data synced 4 min ago</span><span className="topbar-separator">/</span><span>Monday, 25 Oct 2026</span></div>
+      <div className="topbar-left"><span className="live-dot" /> <span>{syncState === "syncing" ? "Syncing live data" : syncState === "error" ? "Live data unavailable" : "Live data synced"}</span><span className="topbar-separator">/</span><span>Monday, 25 Oct 2026</span></div>
       <div className="topbar-actions">
         <label className="select-control compact"><CalendarDays size={15} /><select value={range} onChange={(event) => setRange(event.target.value)} aria-label="Date range"><option>Last 30 days</option><option>Last 7 days</option><option>This quarter</option></select><ChevronDown size={14} /></label>
         <label className="select-control compact comparison"><span>vs.</span><select value={comparison} onChange={(event) => setComparison(event.target.value)} aria-label="Comparison period"><option>Previous period</option><option>Same period last year</option><option>Campaign baseline</option></select><ChevronDown size={14} /></label>
@@ -447,6 +447,7 @@ function Tasks({ tasks, setTasks }: { tasks: typeof initialTasks; setTasks: Reac
 
 function YoutubeTaskRunner({ comments, setComments }: { comments: typeof initialComments; setComments: React.Dispatch<React.SetStateAction<typeof initialComments>> }) {
   const [connection, setConnection] = useState<"Not connected" | "Connected">("Not connected");
+  const liveTasks = trpc.agent.tasks.useQuery(undefined, { refetchInterval: 3000, staleTime: 0, retry: 1 });
   const [agentTasks, setAgentTasks] = useState(initialAgentTasks.map((task) => ({ ...task, status: "Ready", lastRun: "Never" })));
   const [runningTaskId, setRunningTaskId] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -463,6 +464,10 @@ function YoutubeTaskRunner({ comments, setComments }: { comments: typeof initial
   const [researchResult, setResearchResult] = useState<{ title: string; summary: string; detail: string } | null>(null);
   const authorizeYouTube = trpc.youtube.authorize.useMutation();
   const youtubeSnapshot = trpc.youtube.snapshot.useQuery(undefined, { enabled: false, retry: false });
+  useEffect(() => {
+    if (!liveTasks.data?.length) return;
+    setAgentTasks(liveTasks.data.map((task) => ({ id: String(task.id), name: task.title, description: task.description, mode: task.approvalRequired ? "Approval required" : "Read-only", icon: ListChecks, steps: [task.currentStep ?? "Queued from Neon", task.status, task.error ?? "Live task state"], status: task.status, lastRun: task.updatedAt ? new Date(task.updatedAt).toLocaleTimeString() : "Live" })));
+  }, [liveTasks.data]);
   const activeTask = agentTasks.find((task) => task.id === runningTaskId);
   const pendingComments = comments.filter((comment) => comment.status === "Needs reply");
   const eligibleComments = pendingComments.filter((comment) => {
@@ -636,7 +641,12 @@ function YoutubeAgent({ comments, setComments }: { comments: typeof initialComme
 
 export default function Home() {
   const [location, setLocation] = useLocation();
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+    return () => document.documentElement.classList.remove("dark");
+  }, []);
   const [showChatStart, setShowChatStart] = useState(location === "/");
+  const liveTasks = trpc.agent.tasks.useQuery(undefined, { refetchInterval: 3000, staleTime: 0, retry: 1 });
   const current = location === "/tasks" ? "tasks" : location === "/youtube-agent" ? "youtube-agent" : location === "/content" ? "content" : location === "/production" ? "production" : location === "/publishing" ? "publishing" : location === "/analytics" ? "analytics" : "overview";
   const [range, setRange] = useState("Last 30 days");
   const [comparison, setComparison] = useState("Previous period");
@@ -656,7 +666,14 @@ export default function Home() {
   const exportData = () => { const csv = ["Campaign,Status,Profile views,Cost per view,Conversions", ...campaigns.map((item) => `${item.name},${item.status},${item.views},${item.cpv},${item.conversions}`)].join("\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "signal-room-campaigns.csv"; anchor.click(); URL.revokeObjectURL(url); toast.success("CSV exported"); };
   const clearFilters = () => { setCampaignFilter("All videos"); setChannel("All channels"); setAudience("All audiences"); };
 
-  if (showChatStart) return <AgentChatStart onOpenWorkspace={() => setShowChatStart(false)} />;
+  const submitChatTask = async (instruction: string) => {
+    const response = await fetch("/api/agent/tasks/start", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ instruction }) });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error ?? "Unable to start agent task");
+    await liveTasks.refetch();
+  };
 
-  return <div className="app-shell"><Sidebar current={current} onNavigate={navigate} /><main className="main-shell"><Topbar onRefresh={refresh} onExport={exportData} range={range} setRange={setRange} comparison={comparison} setComparison={setComparison} /><div className="mobile-workspace-nav">{workspaceItems.map(({ slug, label, icon: Icon }) => <button key={slug} className={current === slug ? "active" : ""} onClick={() => navigate(slug)}><Icon size={15} /> {label}</button>)}</div><div className="page-content">{current === "overview" && <><div className="filter-bar-wrap"><FilterBar campaign={campaignFilter} setCampaign={setCampaignFilter} channel={channel} setChannel={setChannel} audience={audience} setAudience={setAudience} onClear={clearFilters} /></div><Overview onSelectCampaign={selectCampaign} campaigns={campaigns} channel={channel} campaignFilter={campaignFilter} /></>}{current === "tasks" && <Tasks tasks={tasks} setTasks={setTasks} />}{(current === "youtube-agent" || current === "content" || current === "production" || current === "publishing" || current === "analytics") && <YoutubeAgent comments={comments} setComments={setComments} />}</div></main>{showDetail && selectedCampaignData && <div className="modal-backdrop" onClick={() => setShowDetail(false)}><div className="modal-sheet" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowDetail(false)}><X size={18} /></button><CampaignDetail campaign={selectedCampaignData} /></div></div>}</div>;
+  if (showChatStart) return <AgentChatStart onOpenWorkspace={() => setShowChatStart(false)} onSubmitTask={submitChatTask} />;
+
+  return <div className="app-shell"><Sidebar current={current} onNavigate={navigate} /><main className="main-shell"><Topbar onRefresh={refresh} onExport={exportData} range={range} setRange={setRange} comparison={comparison} setComparison={setComparison} syncState={liveTasks.isFetching ? "syncing" : liveTasks.isError ? "error" : "ready"} /><div className="mobile-workspace-nav">{workspaceItems.map(({ slug, label, icon: Icon }) => <button key={slug} className={current === slug ? "active" : ""} onClick={() => navigate(slug)}><Icon size={15} /> {label}</button>)}</div><div className="page-content">{current === "overview" && <><div className="filter-bar-wrap"><FilterBar campaign={campaignFilter} setCampaign={setCampaignFilter} channel={channel} setChannel={setChannel} audience={audience} setAudience={setAudience} onClear={clearFilters} /></div><Overview onSelectCampaign={selectCampaign} campaigns={campaigns} channel={channel} campaignFilter={campaignFilter} /></>}{current === "tasks" && <Tasks tasks={tasks} setTasks={setTasks} />}{(current === "youtube-agent" || current === "content" || current === "production" || current === "publishing" || current === "analytics") && <YoutubeAgent comments={comments} setComments={setComments} />}</div></main>{showDetail && selectedCampaignData && <div className="modal-backdrop" onClick={() => setShowDetail(false)}><div className="modal-sheet" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowDetail(false)}><X size={18} /></button><CampaignDetail campaign={selectedCampaignData} /></div></div>}</div>;
 }

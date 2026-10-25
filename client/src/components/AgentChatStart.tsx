@@ -8,15 +8,25 @@ const suggestions = [
   "Turn recurring audience questions into a video brief",
 ];
 
-export function AgentChatStart({ onOpenWorkspace }: { onOpenWorkspace: () => void }) {
+export function AgentChatStart({ onOpenWorkspace, onSubmitTask }: { onOpenWorkspace: () => void; onSubmitTask: (message: string) => Promise<void> }) {
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!message.trim()) return;
-    setSubmitted(true);
-    toast.success("Task staged for the YouTube agent", { description: "Review the plan in Agent tasks before any public action." });
+    if (!message.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      await onSubmitTask(message.trim());
+      setSubmitted(true);
+      setMessage("");
+      toast.success("Task staged for the YouTube agent", { description: "Saved to Neon and queued for live execution." });
+    } catch (error) {
+      toast.error("Could not stage task", { description: error instanceof Error ? error.message : "Try again." });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
