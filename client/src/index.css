@@ -536,3 +536,19 @@ h1 { max-width: 760px; margin-top: 9px; color: var(--ink); font-family: Georgia,
   .manual-approval { align-items: flex-start; flex-direction: column; }
   .manual-approval .button { width: 100%; }
 }
+
+.reply-rules { margin-top: 13px; padding: 10px 12px; border: 1px solid rgba(255,255,255,.09); border-radius: 10px; background: rgba(255,255,255,.035); }
+.reply-rules-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.reply-rules-head > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.reply-rules-head b { color: #ded8e7; font-size: 10px; }
+.reply-rules .button-link { display: inline-flex; align-items: center; gap: 5px; color: #c5bbff; font-size: 9px; }
+.rule-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); }
+.rule-check, .rule-number { display: inline-flex; align-items: center; gap: 6px; color: #aaa4b4; font-size: 9px; }
+.rule-check input { width: 13px; height: 13px; accent-color: var(--violet); }
+.rule-number input { width: 48px; padding: 4px 5px; border: 1px solid rgba(255,255,255,.13); border-radius: 5px; background: rgba(0,0,0,.15); color: #f8f4ed; font-size: 9px; }
+.reply-rules .rule-controls .button-link { margin-left: auto; color: #9e96aa; }
+@media (max-width: 760px) {
+  .reply-rules-head { align-items: flex-start; flex-direction: column; }
+  .rule-controls { align-items: flex-start; flex-direction: column; gap: 9px; }
+  .reply-rules .rule-controls .button-link { margin-left: 0; }
+}

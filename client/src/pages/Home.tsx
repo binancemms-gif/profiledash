@@ -204,6 +204,13 @@ const initialAgentTasks = [
   { id: "create-followups", name: "Create follow-up tasks", description: "Turn questions, resource asks, and promising conversations into owner tasks.", mode: "Writes tasks", icon: ListChecks, steps: ["Review conversation tags", "Group related follow-ups", "Assign owners and due dates", "Add to task agent queue"] },
 ];
 
+const defaultReplyRules = {
+  intentOrQuestion: true,
+  includeResourceAsks: true,
+  positiveToneOnly: true,
+  minimumCharacters: 20,
+};
+
 const workspaceItems = [
   { slug: "overview", label: "Profile views", sub: "Growth cockpit", icon: LayoutDashboard },
   { slug: "campaigns", label: "Campaigns", sub: "Plan & monitor", icon: Megaphone },
@@ -414,21 +421,30 @@ function YoutubeTaskRunner({ comments, setComments }: { comments: typeof initial
   const [progress, setProgress] = useState(0);
   const [history, setHistory] = useState<string[]>([]);
   const [stagedCommentIds, setStagedCommentIds] = useState<number[]>([]);
+  const [replyRules, setReplyRules] = useState(defaultReplyRules);
+  const [rulesOpen, setRulesOpen] = useState(false);
   const activeTask = agentTasks.find((task) => task.id === runningTaskId);
+  const pendingComments = comments.filter((comment) => comment.status === "Needs reply");
+  const eligibleComments = pendingComments.filter((comment) => {
+    const intentMatch = ["High intent", "Advocate"].includes(comment.sentiment);
+    const resourceMatch = replyRules.includeResourceAsks && comment.sentiment === "Resource ask";
+    const questionMatch = comment.text.includes("?");
+    return comment.text.length >= replyRules.minimumCharacters && (!replyRules.intentOrQuestion || intentMatch || resourceMatch || questionMatch) && (!replyRules.positiveToneOnly || comment.tone === "Positive");
+  });
 
   useEffect(() => {
     if (!runningTaskId || !activeTask) return;
     if (progress >= activeTask.steps.length) {
-      setAgentTasks((items) => items.map((task) => task.id === runningTaskId ? { ...task, status: task.id === "reply-high-intent" ? "Needs approval" : "Completed", lastRun: "Just now" } : task));
-      if (activeTask.id === "reply-high-intent") setStagedCommentIds(comments.filter((comment) => comment.status === "Needs reply").map((comment) => comment.id));
+      setAgentTasks((items) => items.map((task) => task.id === runningTaskId ? { ...task, status: task.id === "reply-high-intent" && eligibleComments.length > 0 ? "Needs approval" : "Completed", lastRun: "Just now" } : task));
+      if (activeTask.id === "reply-high-intent") setStagedCommentIds(eligibleComments.map((comment) => comment.id));
       setHistory((items) => [`${activeTask.name} finished`, ...items].slice(0, 4));
       setRunningTaskId(null);
-      toast.success(activeTask.id === "reply-high-intent" ? "Replies staged for your approval" : `${activeTask.name} completed`);
+      toast.success(activeTask.id === "reply-high-intent" ? (eligibleComments.length > 0 ? `${eligibleComments.length} replies staged for your approval` : "No comments matched the active reply rules") : `${activeTask.name} completed`);
       return;
     }
     const timer = window.setTimeout(() => setProgress((value) => value + 1), 720);
     return () => window.clearTimeout(timer);
-  }, [activeTask, comments, progress, runningTaskId]);
+  }, [activeTask, comments, eligibleComments, progress, runningTaskId]);
 
   const connect = () => {
     setConnection("Connected");
@@ -451,7 +467,7 @@ function YoutubeTaskRunner({ comments, setComments }: { comments: typeof initial
     setHistory((items) => ["Approved and sent staged replies", ...items].slice(0, 4));
     toast.success("Approved replies sent", { description: "Three public replies were marked complete in the demo queue." });
   };
-  return <section className="panel openclaw-panel"><div className="openclaw-header"><div><div className="eyebrow eyebrow-violet">OpenClaw task runner</div><h2>Give the YouTube agent a job, not just a prompt.</h2><p>OpenClaw supplies the browser, skills, and automation layer. This workspace keeps the task steps, approvals, and receipts visible.</p></div><div className="openclaw-connection"><div className="connection-row"><span className={`connection-dot ${connection === "Connected" ? "connected" : ""}`} /><span>{connection === "Connected" ? "Bridge connected" : "Gateway not connected"}</span></div><button className="button button-secondary small" onClick={connection === "Connected" ? () => setConnection("Not connected") : connect}>{connection === "Connected" ? "Disconnect" : "Connect OpenClaw"}</button></div></div><div className="openclaw-meta"><span><Activity size={13} /> {connection === "Connected" ? "Demo bridge ready · Gateway RPC boundary" : "Demo/local runner · no Gateway connected"}</span><span><Bot size={13} /> Browser profile: <b>openclaw</b></span><span><ShieldIcon /> Public actions require approval</span><a href="https://docs.openclaw.ai/gateway" target="_blank" rel="noreferrer">Read integration docs <ExternalLink size={12} /></a></div><div className="agent-task-grid">{agentTasks.map((task) => { const Icon = task.icon; const isRunning = runningTaskId === task.id; const isApproval = task.status === "Needs approval"; return <article className={`agent-task-card ${isRunning ? "running" : ""}`} key={task.id}><div className="agent-task-top"><span className="task-template-icon"><Icon size={16} /></span><Pill tone={task.status}>{isRunning ? `Step ${Math.min(progress + 1, task.steps.length)} / ${task.steps.length}` : task.status}</Pill></div><h3>{task.name}</h3><p>{task.description}</p><div className="task-step-list">{task.steps.map((step, index) => <div className={`${index < progress && isRunning ? "done" : ""} ${!isRunning && task.status === "Completed" ? "done" : ""}`} key={step}><span>{index < progress && isRunning || task.status === "Completed" ? <Check size={11} /> : index + 1}</span>{step}</div>)}</div>{isRunning && <div className="run-progress"><i style={{ width: `${Math.round((progress / task.steps.length) * 100)}%` }} /></div>}<div className="agent-task-footer"><small>Last run: {task.lastRun}</small>{isApproval ? <button className="button button-primary small" onClick={approveReplies}><CheckCircle2 size={14} /> Approve & send {stagedCommentIds.length ? `(${stagedCommentIds.length})` : ""}</button> : <button className="button button-secondary small" disabled={Boolean(runningTaskId)} onClick={() => runTask(task.id)}>{isRunning ? "Working…" : <><PlayCircle size={14} /> Run task</>}</button>}</div></article>; })}</div>{history.length > 0 && <div className="run-history"><span className="eyebrow">Recent task receipts</span>{history.map((item) => <span key={item}><CheckCircle2 size={13} /> {item}</span>)}</div>}</section>;
+  return <section className="panel openclaw-panel"><div className="openclaw-header"><div><div className="eyebrow eyebrow-violet">OpenClaw task runner</div><h2>Give the YouTube agent a job, not just a prompt.</h2><p>OpenClaw supplies the browser, skills, and automation layer. This workspace keeps the task steps, approvals, and receipts visible.</p></div><div className="openclaw-connection"><div className="connection-row"><span className={`connection-dot ${connection === "Connected" ? "connected" : ""}`} /><span>{connection === "Connected" ? "Bridge connected" : "Gateway not connected"}</span></div><button className="button button-secondary small" onClick={connection === "Connected" ? () => setConnection("Not connected") : connect}>{connection === "Connected" ? "Disconnect" : "Connect OpenClaw"}</button></div></div><div className="openclaw-meta"><span><Activity size={13} /> {connection === "Connected" ? "Demo bridge ready · Gateway RPC boundary" : "Demo/local runner · no Gateway connected"}</span><span><Bot size={13} /> Browser profile: <b>openclaw</b></span><span><ShieldIcon /> Public actions require approval</span><a href="https://docs.openclaw.ai/gateway" target="_blank" rel="noreferrer">Read integration docs <ExternalLink size={12} /></a></div><div className="reply-rules"><div className="reply-rules-head"><div><span className="eyebrow">Automated reply filter</span><b>{eligibleComments.length} of {pendingComments.length} pending comments match</b></div><button className="button-link" onClick={() => setRulesOpen((value) => !value)}><Filter size={13} /> {rulesOpen ? "Hide rules" : "Edit rules"}</button></div>{rulesOpen && <div className="rule-controls"><label className="rule-check"><input type="checkbox" checked={replyRules.intentOrQuestion} onChange={(event) => setReplyRules((rules) => ({ ...rules, intentOrQuestion: event.target.checked }))} /><span>Require intent or a question</span></label><label className="rule-check"><input type="checkbox" checked={replyRules.includeResourceAsks} onChange={(event) => setReplyRules((rules) => ({ ...rules, includeResourceAsks: event.target.checked }))} /><span>Include resource asks</span></label><label className="rule-check"><input type="checkbox" checked={replyRules.positiveToneOnly} onChange={(event) => setReplyRules((rules) => ({ ...rules, positiveToneOnly: event.target.checked }))} /><span>Keep positive tone only</span></label><label className="rule-number"><span>Minimum characters</span><input type="number" min="0" max="200" value={replyRules.minimumCharacters} onChange={(event) => setReplyRules((rules) => ({ ...rules, minimumCharacters: Number(event.target.value) }))} /></label><button className="button-link" onClick={() => setReplyRules(defaultReplyRules)}>Reset</button></div>}</div><div className="agent-task-grid">{agentTasks.map((task) => { const Icon = task.icon; const isRunning = runningTaskId === task.id; const isApproval = task.status === "Needs approval"; return <article className={`agent-task-card ${isRunning ? "running" : ""}`} key={task.id}><div className="agent-task-top"><span className="task-template-icon"><Icon size={16} /></span><Pill tone={task.status}>{isRunning ? `Step ${Math.min(progress + 1, task.steps.length)} / ${task.steps.length}` : task.status}</Pill></div><h3>{task.name}</h3><p>{task.description}</p><div className="task-step-list">{task.steps.map((step, index) => <div className={`${index < progress && isRunning ? "done" : ""} ${!isRunning && task.status === "Completed" ? "done" : ""}`} key={step}><span>{index < progress && isRunning || task.status === "Completed" ? <Check size={11} /> : index + 1}</span>{step}</div>)}</div>{isRunning && <div className="run-progress"><i style={{ width: `${Math.round((progress / task.steps.length) * 100)}%` }} /></div>}<div className="agent-task-footer"><small>Last run: {task.lastRun}</small>{isApproval ? <button className="button button-primary small" onClick={approveReplies}><CheckCircle2 size={14} /> Approve & send {stagedCommentIds.length ? `(${stagedCommentIds.length})` : ""}</button> : <button className="button button-secondary small" disabled={Boolean(runningTaskId)} onClick={() => runTask(task.id)}>{isRunning ? "Working…" : <><PlayCircle size={14} /> Run task</>}</button>}</div></article>; })}</div>{history.length > 0 && <div className="run-history"><span className="eyebrow">Recent task receipts</span>{history.map((item) => <span key={item}><CheckCircle2 size={13} /> {item}</span>)}</div>}</section>;
 }
 
 function ShieldIcon() {
