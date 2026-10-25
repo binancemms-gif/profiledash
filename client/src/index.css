@@ -687,3 +687,33 @@ h1 { max-width: 760px; margin-top: 9px; color: var(--ink); font-family: Georgia,
   .dark .intro-actions .button { flex: 1; }
   .dark h1 { font-size: 35px; }
 }
+
+.chat-start-shell { min-height: 100vh; display: flex; flex-direction: column; background: radial-gradient(circle at 50% 12%, #f0ebff 0, var(--canvas) 34%); }
+.chat-start-topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(20px, 5vw, 72px); border-bottom: 1px solid rgba(221,212,203,.72); background: rgba(255,253,250,.54); backdrop-filter: blur(14px); }
+.chat-brand { display: flex; align-items: center; gap: 9px; color: var(--ink); font-size: 13px; font-weight: 760; letter-spacing: -.02em; }
+.chat-brand-mark { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; color: white; background: var(--violet); box-shadow: 0 7px 16px rgba(118,87,246,.22); }
+.chat-workspace-link { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-soft); background: transparent; font-size: 11px; font-weight: 700; }
+.chat-workspace-link:hover { color: var(--violet); }
+.chat-start-content { width: min(680px, calc(100% - 32px)); margin: auto; text-align: center; }
+.chat-start-kicker { display: inline-flex; align-items: center; gap: 8px; color: #3a9a6c; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.chat-live-dot { width: 7px; height: 7px; display: inline-block; border-radius: 50%; background: #6ed59f; box-shadow: 0 0 0 4px rgba(110,213,159,.14); }
+.chat-start-icon { width: 58px; height: 58px; display: grid; place-items: center; margin: 24px auto 18px; color: var(--violet); border: 1px solid #dcd4ff; border-radius: 18px; background: rgba(235,231,255,.8); }
+.chat-start-content h1 { max-width: none; margin: 0; font-size: clamp(34px, 6vw, 56px); }
+.chat-start-subtitle { max-width: 500px; margin: 16px auto 26px; color: var(--ink-soft); font-size: 13px; line-height: 1.65; }
+.agent-composer { padding: 14px; border: 1px solid #d9d0ff; border-radius: 17px; background: rgba(255,253,250,.88); box-shadow: 0 18px 46px rgba(83,64,160,.12); text-align: left; transition: border-color .18s ease, box-shadow .18s ease; }
+.agent-composer:focus-within { border-color: var(--violet); box-shadow: 0 18px 50px rgba(83,64,160,.18); }
+.agent-composer.submitted { border-color: #b7e7cc; }
+.agent-composer textarea { width: 100%; resize: none; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 14px; line-height: 1.55; }
+.agent-composer textarea::placeholder { color: #a9a19a; }
+.agent-composer-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; padding-top: 11px; border-top: 1px solid #f0ebe6; color: var(--muted); font-size: 10px; }
+.agent-composer-footer span { display: inline-flex; align-items: center; gap: 6px; }
+.agent-composer-footer button { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 10px; color: white; background: var(--violet); }
+.agent-composer-footer button:disabled { cursor: not-allowed; opacity: .4; }
+.chat-staged-note { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; color: #3a9a6c; font-size: 11px; font-weight: 700; }
+.chat-suggestions { display: grid; gap: 7px; margin: 32px auto 0; text-align: left; }
+.chat-suggestions .eyebrow { margin-bottom: 3px; text-align: center; }
+.chat-suggestions button { display: flex; align-items: center; gap: 10px; padding: 12px 13px; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 10px; background: rgba(255,253,250,.6); text-align: left; font-size: 11px; }
+.chat-suggestions button:hover { color: var(--violet); border-color: #d4cbff; background: var(--surface); }
+.chat-suggestions button svg { margin-left: auto; color: #b9b0a8; }
+.chat-start-footnote { margin: 0 auto 24px; padding: 0 20px; color: var(--muted); font-size: 10px; text-align: center; }
+@media (max-width: 560px) { .chat-start-topbar { height: 60px; } .chat-start-content { margin-top: 10vh; } .chat-start-subtitle { font-size: 12px; } .chat-start-footnote { margin-bottom: 18px; } }
