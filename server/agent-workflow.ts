@@ -1,7 +1,7 @@
 import { FatalError, RetryableError } from "workflow";
 import { updateAgentTaskWorkflow } from "./db";
 
-async function executeAgentTask(taskId: number, instruction: string) {
+export async function executeAgentTask(taskId: number, instruction: string) {
   "use step";
   await updateAgentTaskWorkflow(taskId, { status: "Running", currentStep: "Interpret instruction" });
   if (!instruction.trim()) throw new FatalError("Instruction is required");

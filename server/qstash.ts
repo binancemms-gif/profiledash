@@ -1,6 +1,6 @@
 import { Client, Receiver } from "@upstash/qstash";
 import { start } from "workflow/api";
-import { agentTaskWorkflow } from "./agent-workflow";
+import { agentTaskWorkflow, executeAgentTask } from "./agent-workflow";
 import { createAgentTask, updateAgentTaskWorkflow } from "./db";
 
 function getQStash() {
@@ -25,6 +25,11 @@ export async function startQueuedAgentTask(req: any, instruction: string) {
     const result = await qstash.publishJSON({ url: `${appOrigin(req)}/api/agent/tasks/${task.id}/run`, body: { taskId: task.id, instruction }, retries: 3 });
     await updateAgentTaskWorkflow(task.id, { workflowRunId: result.messageId });
     return { task, messageId: result.messageId };
+  }
+  if (process.env.NODE_ENV === "development") {
+    const result = await executeAgentTask(task.id, instruction);
+    await updateAgentTaskWorkflow(task.id, { workflowRunId: `local-${task.id}` });
+    return { task: result, messageId: `local-${task.id}` };
   }
   const run = await start(agentTaskWorkflow, [task.id, instruction]);
   await updateAgentTaskWorkflow(task.id, { workflowRunId: run.runId });
