@@ -1,8 +1,8 @@
 
-## Firecrawl YouTube page and comment sync
+## Upstream reference review and social research adapter
 
-- [x] Crawl a public YouTube performance-marketing page through the configured Firecrawl connector.
-- [x] Fetch page metadata and top-level public comments through the YouTube provider.
-- [x] Show the crawled source URL, channel, view count, public comment count, and crawl freshness in ProfileDash.
-- [x] Import normalized Firecrawl comments into the existing rule-based filter and human approval queue.
-- [x] Keep connector credentials out of the browser and label the current snapshot as preview-safe until live server-side scheduling is configured.
+- [x] Review `youtube/youtube-ios-player-helper`, `youtube/cobalt_sandbox`, the corrected `youtube/geo-search-tool`, and `ScrapeCreators/social-media-research-skills` with source and license notes.
+- [x] Document why the archived iOS helper and large Cobalt sandbox remain references rather than incompatible vendored runtimes.
+- [x] Add a workflow-first YouTube Agent skill layer for comment mining, transcript intelligence, baseline-aware outlier finding, and geo discovery.
+- [x] Route the Firecrawl comment snapshot through the comment-mining workflow with sample-size and public-data caveats.
+- [x] Preserve approval gating, source citations, exact audience language, and server-side credential boundaries.

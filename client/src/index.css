@@ -621,3 +621,23 @@ h1 { max-width: 760px; margin-top: 9px; color: var(--ink); font-family: Georgia,
   .firecrawl-source-body { align-items: flex-start; flex-direction: column; }
   .firecrawl-source-body .button { width: 100%; }
 }
+
+.research-skills-box { margin-top: 11px; padding: 12px; border: 1px solid rgba(168,132,255,.22); border-radius: 10px; background: rgba(128,88,220,.08); }
+.research-skills-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.research-skills-head > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.research-skills-head b { color: #e8e1ff; font-size: 10px; }
+.skill-source { color: #a99bd2; font-size: 8px; }
+.research-skill-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 10px; }
+.research-skill { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 55px; padding: 9px; border: 1px solid rgba(182,151,255,.18); border-radius: 8px; color: #dcd4f7; background: rgba(255,255,255,.035); text-align: left; cursor: pointer; }
+.research-skill:hover { border-color: rgba(182,151,255,.52); background: rgba(149,108,239,.13); }
+.research-skill span { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.research-skill b { font-size: 9px; }
+.research-skill small { color: #9f96b5; font-size: 8px; line-height: 1.35; }
+.research-skill svg { flex: 0 0 auto; color: #b69bff; }
+.research-result { display: grid; grid-template-columns: minmax(160px, .7fr) auto 1.5fr; align-items: center; gap: 12px; margin-top: 9px; padding: 9px 10px; border-radius: 8px; background: rgba(7,12,22,.26); }
+.research-result > div { display: flex; flex-direction: column; gap: 4px; }
+.research-result b { color: #efeaff; font-size: 9px; }
+.research-result strong { color: #d8caff; font-size: 9px; }
+.research-result p { margin: 0; color: #aaa1bb; font-size: 8px; line-height: 1.45; }
+@media (max-width: 980px) { .research-skill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .research-result { grid-template-columns: 1fr; gap: 5px; } }
+@media (max-width: 760px) { .research-skills-head { align-items: flex-start; flex-direction: column; } .research-skill-grid { grid-template-columns: 1fr; } }
