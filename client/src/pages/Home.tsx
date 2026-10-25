@@ -316,7 +316,7 @@ function Sidebar({ current, onNavigate }: { current: string; onNavigate: (slug: 
     <aside className="sidebar">
       <div className="brand-lockup">
         <div className="brand-mark"><span /><span /><span /></div>
-        <div><div className="brand-name">signal <span>/</span> room</div><div className="brand-caption">Growth operations</div></div>
+        <div><div className="brand-name">Summer workspace</div><div className="brand-caption">YouTube agent</div></div>
       </div>
       <div className="sidebar-label">YouTube workspace</div>
       <nav className="sidebar-nav" aria-label="Workspace navigation">
@@ -343,7 +343,7 @@ function Sidebar({ current, onNavigate }: { current: string; onNavigate: (slug: 
 function Topbar({ onRefresh, onExport, range, setRange, comparison, setComparison }: { onRefresh: () => void; onExport: () => void; range: string; setRange: (value: string) => void; comparison: string; setComparison: (value: string) => void }) {
   return (
     <header className="topbar">
-      <div className="mobile-brand"><div className="brand-mark"><span /><span /><span /></div><span>signal / room</span></div>
+      <div className="mobile-brand"><div className="brand-mark"><span /><span /><span /></div><span>Summer workspace</span></div>
       <div className="topbar-left"><span className="live-dot" /> <span>Data synced 4 min ago</span><span className="topbar-separator">/</span><span>Monday, 25 Oct 2026</span></div>
       <div className="topbar-actions">
         <label className="select-control compact"><CalendarDays size={15} /><select value={range} onChange={(event) => setRange(event.target.value)} aria-label="Date range"><option>Last 30 days</option><option>Last 7 days</option><option>This quarter</option></select><ChevronDown size={14} /></label>
@@ -652,7 +652,7 @@ export default function Home() {
   const selectedCampaignData = useMemo(() => campaigns.find((item) => item.id === selectedCampaign), [campaigns, selectedCampaign]);
   const navigate = (slug: string) => { setShowChatStart(false); setLocation(slug === "overview" ? "/" : `/${slug}`); };
   const selectCampaign = (id: string) => { setSelectedCampaign(id); setShowDetail(true); };
-  const refresh = () => toast.success("Signal room refreshed", { description: "Latest activity is now in view." });
+  const refresh = () => toast.success("Summer workspace refreshed", { description: "Latest activity is now in view." });
   const exportData = () => { const csv = ["Campaign,Status,Profile views,Cost per view,Conversions", ...campaigns.map((item) => `${item.name},${item.status},${item.views},${item.cpv},${item.conversions}`)].join("\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "signal-room-campaigns.csv"; anchor.click(); URL.revokeObjectURL(url); toast.success("CSV exported"); };
   const clearFilters = () => { setCampaignFilter("All videos"); setChannel("All channels"); setAudience("All audiences"); };
 

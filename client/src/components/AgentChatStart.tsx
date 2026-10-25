@@ -22,7 +22,7 @@ export function AgentChatStart({ onOpenWorkspace }: { onOpenWorkspace: () => voi
   return (
     <main className="chat-start-shell">
       <div className="chat-start-topbar">
-        <div className="chat-brand"><span className="chat-brand-mark"><Youtube size={17} /></span><span>signal / room</span></div>
+        <div className="chat-brand"><span className="chat-brand-mark"><Youtube size={17} /></span><span>Summer workspace</span></div>
         <button className="chat-workspace-link" onClick={onOpenWorkspace}>Open workspace <ChevronRight size={15} /></button>
       </div>
       <section className="chat-start-content" aria-labelledby="chat-start-title">
