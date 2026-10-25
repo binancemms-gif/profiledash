@@ -239,7 +239,6 @@ const defaultReplyRules = {
 
 const workspaceItems = [
   { slug: "overview", label: "Profile views", sub: "Growth cockpit", icon: LayoutDashboard },
-  { slug: "campaigns", label: "Campaigns", sub: "Plan & monitor", icon: Megaphone },
   { slug: "tasks", label: "Tasks", sub: "Keep the signal moving", icon: ListChecks },
   { slug: "youtube-agent", label: "YouTube agent", sub: "Reply with intent", icon: Youtube },
 ];
@@ -614,7 +613,7 @@ function YoutubeAgent({ comments, setComments }: { comments: typeof initialComme
 
 export default function Home() {
   const [location, setLocation] = useLocation();
-  const current = location === "/campaigns" ? "campaigns" : location === "/tasks" ? "tasks" : location === "/youtube-agent" ? "youtube-agent" : "overview";
+  const current = location === "/tasks" ? "tasks" : location === "/youtube-agent" ? "youtube-agent" : "overview";
   const [range, setRange] = useState("Last 30 days");
   const [comparison, setComparison] = useState("Previous period");
   const [campaignFilter, setCampaignFilter] = useState("All campaigns");
@@ -633,5 +632,5 @@ export default function Home() {
   const exportData = () => { const csv = ["Campaign,Status,Profile views,Cost per view,Conversions", ...campaigns.map((item) => `${item.name},${item.status},${item.views},${item.cpv},${item.conversions}`)].join("\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "signal-room-campaigns.csv"; anchor.click(); URL.revokeObjectURL(url); toast.success("CSV exported"); };
   const clearFilters = () => { setCampaignFilter("All campaigns"); setChannel("All channels"); setAudience("All audiences"); };
 
-  return <div className="app-shell"><Sidebar current={current} onNavigate={navigate} /><main className="main-shell"><Topbar onRefresh={refresh} onExport={exportData} range={range} setRange={setRange} comparison={comparison} setComparison={setComparison} /><div className="mobile-workspace-nav">{workspaceItems.map(({ slug, label, icon: Icon }) => <button key={slug} className={current === slug ? "active" : ""} onClick={() => navigate(slug)}><Icon size={15} /> {label}</button>)}</div><div className="page-content">{current === "overview" && <><div className="filter-bar-wrap"><FilterBar campaign={campaignFilter} setCampaign={setCampaignFilter} channel={channel} setChannel={setChannel} audience={audience} setAudience={setAudience} onClear={clearFilters} /></div><Overview onSelectCampaign={selectCampaign} campaigns={campaigns} channel={channel} campaignFilter={campaignFilter} /></>}{current === "campaigns" && <Campaigns campaigns={campaigns} setCampaigns={setCampaigns} onSelectCampaign={(id) => { setSelectedCampaign(id); }} selectedCampaign={selectedCampaign} />}{current === "tasks" && <Tasks tasks={tasks} setTasks={setTasks} />}{current === "youtube-agent" && <YoutubeAgent comments={comments} setComments={setComments} />}</div></main>{showDetail && selectedCampaignData && <div className="modal-backdrop" onClick={() => setShowDetail(false)}><div className="modal-sheet" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowDetail(false)}><X size={18} /></button><CampaignDetail campaign={selectedCampaignData} /></div></div>}</div>;
+  return <div className="app-shell"><Sidebar current={current} onNavigate={navigate} /><main className="main-shell"><Topbar onRefresh={refresh} onExport={exportData} range={range} setRange={setRange} comparison={comparison} setComparison={setComparison} /><div className="mobile-workspace-nav">{workspaceItems.map(({ slug, label, icon: Icon }) => <button key={slug} className={current === slug ? "active" : ""} onClick={() => navigate(slug)}><Icon size={15} /> {label}</button>)}</div><div className="page-content">{current === "overview" && <><div className="filter-bar-wrap"><FilterBar campaign={campaignFilter} setCampaign={setCampaignFilter} channel={channel} setChannel={setChannel} audience={audience} setAudience={setAudience} onClear={clearFilters} /></div><Overview onSelectCampaign={selectCampaign} campaigns={campaigns} channel={channel} campaignFilter={campaignFilter} /></>}{current === "tasks" && <Tasks tasks={tasks} setTasks={setTasks} />}{current === "youtube-agent" && <YoutubeAgent comments={comments} setComments={setComments} />}</div></main>{showDetail && selectedCampaignData && <div className="modal-backdrop" onClick={() => setShowDetail(false)}><div className="modal-sheet" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowDetail(false)}><X size={18} /></button><CampaignDetail campaign={selectedCampaignData} /></div></div>}</div>;
 }

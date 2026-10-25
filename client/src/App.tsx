@@ -10,7 +10,6 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/campaigns" component={Home} />
       <Route path="/tasks" component={Home} />
       <Route path="/youtube-agent" component={Home} />
       <Route path="/404" component={NotFound} />
