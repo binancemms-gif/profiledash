@@ -86,3 +86,9 @@ Signal violet `#7657F6` — a vivid but disciplined accent that belongs to the p
 ## Delivery workflow
 
 Implement the frontend, add the route manifest and project metadata, run TypeScript diagnostics and the static build, start the configured preview server, verify the route manifest over HTTP and capture desktop/mobile screenshots for visual inspection, then commit the intended files to the project repository so the managed project has a recoverable checkpoint.
+
+## OpenClaw YouTube task execution update
+
+- Add a YouTube task-runner panel with OpenClaw bridge readiness, browser-profile context, task templates, step progress, approvals, and recent receipts.
+- Keep public actions approval-gated: scanning and task creation can complete automatically in the local demo state, while replying to comments stages drafts until the owner clicks Approve & send.
+- Do not store Gateway tokens or pretend the static browser app is a live Gateway client. The UI should make the next server-side connector requirement explicit.

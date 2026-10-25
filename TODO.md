@@ -43,3 +43,11 @@
 - [x] Start the configured preview server and verify readiness.
 - [x] Inspect desktop and mobile renders and fix any confirmed layout issues.
 - [x] Commit the complete website to the managed project repository.
+
+## OpenClaw YouTube task execution
+
+- [x] Show an OpenClaw bridge state with explicit connected/not-connected status and browser-profile context.
+- [x] Provide task templates for scanning comments, replying to high-intent comments, and creating follow-up tasks.
+- [x] Show step-by-step task progress and retain recent task receipts.
+- [x] Require owner approval before staged public replies are marked sent.
+- [x] Document the live Gateway connector boundary without storing Gateway tokens in the static browser app.
