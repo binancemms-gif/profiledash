@@ -10,7 +10,7 @@ const suggestions = [
   "Turn recurring audience questions into a video brief",
 ];
 
-export function AgentChatStart({ onOpenWorkspace, onSubmitTask }: { onOpenWorkspace: () => void; onSubmitTask: (message: string) => Promise<string> }) {
+export function AgentChatStart({ onOpenWorkspace, onSubmitTask }: { onOpenWorkspace: () => void; onSubmitTask: (messages: ChatMessage[]) => Promise<string> }) {
   const [message, setMessage] = useState("");
   const [conversation, setConversation] = useState<ChatMessage[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -21,9 +21,10 @@ export function AgentChatStart({ onOpenWorkspace, onSubmitTask }: { onOpenWorksp
     if (!message.trim() || submitting) return;
     const prompt = message.trim();
     setSubmitting(true);
-    setConversation((items) => [...items, { role: "user", content: prompt }]);
+    const nextConversation = [...conversation, { role: "user" as const, content: prompt }];
+    setConversation(nextConversation);
     try {
-      const reply = await onSubmitTask(prompt);
+      const reply = await onSubmitTask(nextConversation);
       setConversation((items) => [...items, { role: "assistant", content: reply }]);
       setSubmitted(true);
       setMessage("");

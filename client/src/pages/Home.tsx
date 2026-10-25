@@ -666,11 +666,12 @@ export default function Home() {
   const exportData = () => { const csv = ["Campaign,Status,Profile views,Cost per view,Conversions", ...campaigns.map((item) => `${item.name},${item.status},${item.views},${item.cpv},${item.conversions}`)].join("\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "signal-room-campaigns.csv"; anchor.click(); URL.revokeObjectURL(url); toast.success("CSV exported"); };
   const clearFilters = () => { setCampaignFilter("All videos"); setChannel("All channels"); setAudience("All audiences"); };
 
-  const submitChatTask = async (instruction: string) => {
-    const taskResponse = await fetch("/api/agent/tasks/start", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ instruction }) });
+  const submitChatTask = async (messages: { role: "user" | "assistant"; content: string }[]) => {
+    const latestInstruction = messages.at(-1)?.content ?? "";
+    const taskResponse = await fetch("/api/agent/tasks/start", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ instruction: latestInstruction }) });
     const taskPayload = await taskResponse.json();
     if (!taskResponse.ok) throw new Error(taskPayload.error ?? "Unable to start agent task");
-    const chatResponse = await fetch("/api/agent/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: [{ role: "user", content: instruction }] }) });
+    const chatResponse = await fetch("/api/agent/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages }) });
     const chatPayload = await chatResponse.json();
     if (!chatResponse.ok) throw new Error(chatPayload.error ?? "Groq agent unavailable");
     await liveTasks.refetch();
