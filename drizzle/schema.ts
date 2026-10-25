@@ -20,4 +20,20 @@ export const users = pgTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+export const agentTasks = pgTable("agent_tasks", {
+  id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  owner: text("owner").notNull().default("Maya"),
+  status: varchar("status", { length: 32 }).notNull().default("Todo"),
+  priority: varchar("priority", { length: 16 }).notNull().default("Medium"),
+  area: varchar("area", { length: 64 }).notNull().default("YouTube"),
+  dueAt: timestamp("due_at", { withTimezone: true }),
+  retryCount: integer("retry_count").notNull().default(0),
+  approvalRequired: integer("approval_required").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type AgentTask = typeof agentTasks.$inferSelect;
+export type InsertAgentTask = typeof agentTasks.$inferInsert;

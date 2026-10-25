@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertAgentTask, InsertUser, agentTasks, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,22 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function listAgentTasks() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(agentTasks).orderBy(desc(agentTasks.createdAt));
+}
+
+export async function createAgentTask(input: InsertAgentTask) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const [task] = await db.insert(agentTasks).values(input).returning();
+  return task;
+}
+
+export async function updateAgentTask(id: number, status: string, retryCount?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const [task] = await db.update(agentTasks).set({ status, retryCount, updatedAt: new Date() }).where(eq(agentTasks.id, id)).returning();
+  return task;
+}
