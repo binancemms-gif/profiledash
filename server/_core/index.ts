@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { runQueuedAgentTask, startQueuedAgentTask } from "../qstash";
+import { runGroqAgent, type AgentChatMessage } from "../groq";
 
 export function createApp() {
   const app = express();
@@ -30,6 +31,17 @@ export function createApp() {
       res.status(202).json({ runId: run.runId });
     } catch (error) {
       res.status(401).json({ error: error instanceof Error ? error.message : "Unable to run task" });
+    }
+  });
+  app.post("/api/agent/chat", async (req, res) => {
+    try {
+      const messages = Array.isArray(req.body?.messages) ? req.body.messages : [];
+      const validMessages = messages.filter((message: AgentChatMessage) => ["user", "assistant"].includes(message?.role) && typeof message?.content === "string").slice(-16);
+      if (!validMessages.length) return res.status(400).json({ error: "messages are required" });
+      const result = await runGroqAgent(validMessages);
+      res.json(result);
+    } catch (error) {
+      res.status(502).json({ error: error instanceof Error ? error.message : "Agent unavailable" });
     }
   });
   app.get("/api/platform/config.js", (_req, res) => {

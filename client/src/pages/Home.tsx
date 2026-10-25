@@ -667,10 +667,14 @@ export default function Home() {
   const clearFilters = () => { setCampaignFilter("All videos"); setChannel("All channels"); setAudience("All audiences"); };
 
   const submitChatTask = async (instruction: string) => {
-    const response = await fetch("/api/agent/tasks/start", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ instruction }) });
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error ?? "Unable to start agent task");
+    const taskResponse = await fetch("/api/agent/tasks/start", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ instruction }) });
+    const taskPayload = await taskResponse.json();
+    if (!taskResponse.ok) throw new Error(taskPayload.error ?? "Unable to start agent task");
+    const chatResponse = await fetch("/api/agent/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: [{ role: "user", content: instruction }] }) });
+    const chatPayload = await chatResponse.json();
+    if (!chatResponse.ok) throw new Error(chatPayload.error ?? "Groq agent unavailable");
     await liveTasks.refetch();
+    return chatPayload.content as string;
   };
 
   if (showChatStart) return <AgentChatStart onOpenWorkspace={() => setShowChatStart(false)} onSubmitTask={submitChatTask} />;

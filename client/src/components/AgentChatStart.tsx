@@ -1,4 +1,6 @@
 import { FormEvent, useState } from "react";
+
+type ChatMessage = { role: "user" | "assistant"; content: string };
 import { ArrowUp, Bot, ChevronRight, Sparkles, Youtube } from "lucide-react";
 import { toast } from "sonner";
 
@@ -8,22 +10,26 @@ const suggestions = [
   "Turn recurring audience questions into a video brief",
 ];
 
-export function AgentChatStart({ onOpenWorkspace, onSubmitTask }: { onOpenWorkspace: () => void; onSubmitTask: (message: string) => Promise<void> }) {
+export function AgentChatStart({ onOpenWorkspace, onSubmitTask }: { onOpenWorkspace: () => void; onSubmitTask: (message: string) => Promise<string> }) {
   const [message, setMessage] = useState("");
+  const [conversation, setConversation] = useState<ChatMessage[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!message.trim() || submitting) return;
+    const prompt = message.trim();
     setSubmitting(true);
+    setConversation((items) => [...items, { role: "user", content: prompt }]);
     try {
-      await onSubmitTask(message.trim());
+      const reply = await onSubmitTask(prompt);
+      setConversation((items) => [...items, { role: "assistant", content: reply }]);
       setSubmitted(true);
       setMessage("");
-      toast.success("Task staged for the YouTube agent", { description: "Saved to Neon and queued for live execution." });
+      toast.success("Summer is working", { description: "The task was saved to Neon and the response came from Groq." });
     } catch (error) {
-      toast.error("Could not stage task", { description: error instanceof Error ? error.message : "Try again." });
+      toast.error("Summer could not respond", { description: error instanceof Error ? error.message : "Try again." });
     } finally {
       setSubmitting(false);
     }
@@ -40,9 +46,10 @@ export function AgentChatStart({ onOpenWorkspace, onSubmitTask }: { onOpenWorksp
         <div className="chat-start-icon"><Bot size={28} strokeWidth={1.6} /></div>
         <h1 id="chat-start-title">What should we work on?</h1>
         <p className="chat-start-subtitle">Ask your channel agent to research, plan, draft, or organize the next move. Public actions stay approval-gated.</p>
+        {conversation.length > 0 && <div className="chat-transcript" aria-live="polite">{conversation.map((item, index) => <div className={`chat-message ${item.role}`} key={`${item.role}-${index}`}><span>{item.role === "assistant" ? "Summer" : "You"}</span><p>{item.content}</p></div>)}</div>}
         <form className={`agent-composer ${submitted ? "submitted" : ""}`} onSubmit={submit}>
           <textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Tell the agent what you want to accomplish..." rows={3} aria-label="Message the YouTube agent" />
-          <div className="agent-composer-footer"><span><Sparkles size={14} /> Agent can research, plan, and draft</span><button type="submit" aria-label="Send message" disabled={!message.trim()}><ArrowUp size={17} /></button></div>
+          <div className="agent-composer-footer"><span><Sparkles size={14} /> Agent can research, plan, and draft</span><button type="submit" aria-label="Send message" disabled={!message.trim() || submitting}><ArrowUp size={17} /></button></div>
         </form>
         {submitted && <div className="chat-staged-note"><span className="chat-live-dot" /> Plan staged. Your agent task is waiting for review.</div>}
         <div className="chat-suggestions"><div className="eyebrow">Try asking</div>{suggestions.map((suggestion) => <button key={suggestion} onClick={() => setMessage(suggestion)}>{suggestion}<ChevronRight size={14} /></button>)}</div>
