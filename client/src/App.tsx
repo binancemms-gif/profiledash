@@ -13,6 +13,8 @@ function Router() {
       <Route path="/tasks" component={Home} />
       <Route path="/youtube-agent" component={Home} />
       <Route path="/content" component={Home} />
+      <Route path="/production" component={Home} />
+      <Route path="/publishing" component={Home} />
       <Route path="/analytics" component={Home} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
