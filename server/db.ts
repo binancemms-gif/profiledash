@@ -108,3 +108,10 @@ export async function updateAgentTask(id: number, status: string, retryCount?: n
   const [task] = await db.update(agentTasks).set({ status, retryCount, updatedAt: new Date() }).where(eq(agentTasks.id, id)).returning();
   return task;
 }
+
+export async function updateAgentTaskWorkflow(id: number, values: Partial<{ status: string; workflowRunId: string; currentStep: string; result: string; error: string; retryCount: number }>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const [task] = await db.update(agentTasks).set({ ...values, updatedAt: new Date() }).where(eq(agentTasks.id, id)).returning();
+  return task;
+}

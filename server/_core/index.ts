@@ -7,12 +7,31 @@ import { publicPlatformScript } from "./publicConfig";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { runQueuedAgentTask, startQueuedAgentTask } from "../qstash";
 
 export function createApp() {
   const app = express();
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
+  app.post("/api/agent/tasks/start", async (req, res) => {
+    try {
+      const instruction = typeof req.body?.instruction === "string" ? req.body.instruction : "";
+      if (!instruction.trim()) return res.status(400).json({ error: "instruction is required" });
+      res.status(202).json(await startQueuedAgentTask(req, instruction));
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unable to start task" });
+    }
+  });
+  app.post("/api/agent/tasks/:taskId/run", async (req, res) => {
+    try {
+      const taskId = Number(req.params.taskId);
+      const run = await runQueuedAgentTask(req, { taskId, instruction: req.body?.instruction ?? "" });
+      res.status(202).json({ runId: run.runId });
+    } catch (error) {
+      res.status(401).json({ error: error instanceof Error ? error.message : "Unable to run task" });
+    }
+  });
   app.get("/api/platform/config.js", (_req, res) => {
     res.set("Cache-Control", "no-store").type("application/javascript").send(publicPlatformScript());
   });

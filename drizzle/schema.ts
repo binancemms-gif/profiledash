@@ -31,6 +31,10 @@ export const agentTasks = pgTable("agent_tasks", {
   dueAt: timestamp("due_at", { withTimezone: true }),
   retryCount: integer("retry_count").notNull().default(0),
   approvalRequired: integer("approval_required").notNull().default(0),
+  workflowRunId: text("workflow_run_id"),
+  currentStep: text("current_step"),
+  result: text("result"),
+  error: text("error"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

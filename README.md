@@ -33,6 +33,12 @@ The app honors `PORT` and defaults to `3000`.
 | `pnpm build:static` | Build the static dashboard |
 | `pnpm db:migrate` | Apply checked-in database migrations |
 
+## Agent workflows
+
+Agent tasks are persisted in Neon and queued through Upstash QStash when `QSTASH_TOKEN` is configured. The workflow endpoint is `POST /api/agent/tasks/start` with `{ "instruction": "..." }`; QStash delivers the signed execution request to `/api/agent/tasks/:taskId/run`. Without QStash credentials, local development starts the Workflow SDK run directly. Task status, current step, result, error, and workflow run ID remain in Neon.
+
+Required workflow variables are listed in `.env.example`: `QSTASH_URL`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY`, and `REDIS_URL` when your Upstash setup uses Redis-backed state.
+
 ## Configuration and security
 
 `.env.example` documents the required runtime configuration without containing credentials. Copy it to `.env` for local development; `.env` and other environment files are ignored by Git. Private keys remain server-side and public runtime values are explicitly allowlisted in `server/_core/publicConfig.ts`.
