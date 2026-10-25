@@ -1,7 +1,7 @@
 
-## Automated reply filtering
+## Command chatbox triggers
 
-- [x] Filter pending YouTube comments with visible rule-based matching before reply staging.
-- [x] Show editable rules for intent/questions, resource asks, tone, and minimum comment length.
-- [x] Stage only comments that match the active rules and preserve human approval before public replies.
-- [x] Show the number of matching comments and a no-match result when the rules exclude the queue.
+- [x] Add a YouTube Agent chatbox that accepts plain-language commands and sends trigger messages.
+- [x] Support scan-comments, stage-replies, and create-follow-up-tasks commands with one-tap suggestions.
+- [x] Show a short agent response history and make bridge or busy-task blockers explicit.
+- [x] Preserve rule-based filtering and human approval for public reply actions.

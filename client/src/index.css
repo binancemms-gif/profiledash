@@ -552,3 +552,28 @@ h1 { max-width: 760px; margin-top: 9px; color: var(--ink); font-family: Georgia,
   .rule-controls { align-items: flex-start; flex-direction: column; gap: 9px; }
   .reply-rules .rule-controls .button-link { margin-left: 0; }
 }
+
+.agent-command-box { margin-top: 11px; padding: 12px; border: 1px solid rgba(255,255,255,.09); border-radius: 10px; background: rgba(0,0,0,.12); }
+.agent-command-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.agent-command-head > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.agent-command-head b { color: #ded8e7; font-size: 10px; }
+.command-online { display: inline-flex; align-items: center; gap: 5px; color: #8f8a98; font-size: 9px; }
+.command-online .live-dot { width: 5px; height: 5px; }
+.command-messages { display: grid; gap: 6px; max-height: 126px; overflow: auto; margin-top: 10px; padding-right: 4px; }
+.command-message { display: flex; align-items: flex-start; gap: 7px; max-width: 82%; color: #b4aeba; font-size: 9px; line-height: 1.45; }
+.command-message.user { justify-self: end; flex-direction: row-reverse; color: #e6e0ee; text-align: right; }
+.command-avatar { flex: 0 0 auto; width: 19px; height: 19px; display: grid; place-items: center; border-radius: 6px; color: #c7bfff; background: rgba(118,87,246,.2); font-size: 7px; font-weight: 800; }
+.command-message.user .command-avatar { color: #25222c; background: #ded8e7; }
+.agent-command-form { display: flex; gap: 7px; margin-top: 10px; }
+.agent-command-form input { min-width: 0; flex: 1; padding: 9px 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 7px; outline: none; background: rgba(255,255,255,.06); color: #f8f4ed; font: inherit; font-size: 10px; }
+.agent-command-form input::placeholder { color: #77717f; }
+.agent-command-form input:focus { border-color: rgba(156,139,255,.75); box-shadow: 0 0 0 3px rgba(118,87,246,.12); }
+.command-suggestions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px; color: #77717f; font-size: 8px; }
+.command-suggestions button { padding: 4px 7px; border: 1px solid rgba(255,255,255,.1); border-radius: 99px; background: rgba(255,255,255,.04); color: #aaa3b3; font: inherit; font-size: 8px; cursor: pointer; }
+.command-suggestions button:hover { border-color: rgba(156,139,255,.6); color: #ded8e7; }
+@media (max-width: 760px) {
+  .agent-command-head { align-items: flex-start; flex-direction: column; }
+  .agent-command-form { align-items: stretch; flex-direction: column; }
+  .agent-command-form .button { width: 100%; }
+  .command-message { max-width: 95%; }
+}

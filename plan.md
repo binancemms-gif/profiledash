@@ -1,4 +1,4 @@
 
-## Automated reply filtering update
+## Command chatbox update
 
-The YouTube Agent now evaluates pending comments against configurable rules before staging replies: require intent or a question, include resource asks, keep positive tone only, and enforce a minimum character count. The runner displays the match count, lets the owner edit or reset the rules, stages only matching comment IDs, and preserves the existing approval step.
+The YouTube Agent includes a command chatbox with plain-language trigger parsing for scanning comments, staging high-intent replies, and creating follow-up tasks. It keeps a short conversation history, offers one-tap command suggestions, reports bridge or in-progress blockers, and routes public replies through the existing approval gate.
