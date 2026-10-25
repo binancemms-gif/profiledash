@@ -49,6 +49,7 @@
     "@trpc/client": "^11.6.0",
     "@trpc/react-query": "^11.6.0",
     "@trpc/server": "^11.6.0",
+    "@upstash/qstash": "^2.12.1",
     "@vercel/connect": "^2.5.5",
     "axios": "^1.12.0",
     "class-variance-authority": "^0.7.1",
@@ -80,6 +81,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
+    "workflow": "^5.2.3",
     "wouter": "^3.3.5",
     "zod": "^4.1.12"
   },
