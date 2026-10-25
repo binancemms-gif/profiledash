@@ -36,5 +36,8 @@ jobs:
       - name: Typecheck
         run: pnpm check
 
+      - name: Test
+        run: pnpm test
+
       - name: Build static dashboard
         run: pnpm build:static
