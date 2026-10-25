@@ -61,6 +61,7 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { AgentChatStart } from "@/components/AgentChatStart";
 
 const profileTrend = [
   { day: "Oct 12", views: 1180, visitors: 754, actions: 68 },
@@ -315,7 +316,7 @@ function Sidebar({ current, onNavigate }: { current: string; onNavigate: (slug: 
     <aside className="sidebar">
       <div className="brand-lockup">
         <div className="brand-mark"><span /><span /><span /></div>
-        <div><div className="brand-name">signal <span>/</span> room</div><div className="brand-caption">Growth operations</div></div>
+        <div><div className="brand-name">Summer workspace</div><div className="brand-caption">YouTube agent</div></div>
       </div>
       <div className="sidebar-label">YouTube workspace</div>
       <nav className="sidebar-nav" aria-label="Workspace navigation">
@@ -342,7 +343,7 @@ function Sidebar({ current, onNavigate }: { current: string; onNavigate: (slug: 
 function Topbar({ onRefresh, onExport, range, setRange, comparison, setComparison }: { onRefresh: () => void; onExport: () => void; range: string; setRange: (value: string) => void; comparison: string; setComparison: (value: string) => void }) {
   return (
     <header className="topbar">
-      <div className="mobile-brand"><div className="brand-mark"><span /><span /><span /></div><span>signal / room</span></div>
+      <div className="mobile-brand"><div className="brand-mark"><span /><span /><span /></div><span>Summer workspace</span></div>
       <div className="topbar-left"><span className="live-dot" /> <span>Data synced 4 min ago</span><span className="topbar-separator">/</span><span>Monday, 25 Oct 2026</span></div>
       <div className="topbar-actions">
         <label className="select-control compact"><CalendarDays size={15} /><select value={range} onChange={(event) => setRange(event.target.value)} aria-label="Date range"><option>Last 30 days</option><option>Last 7 days</option><option>This quarter</option></select><ChevronDown size={14} /></label>
@@ -635,6 +636,7 @@ function YoutubeAgent({ comments, setComments }: { comments: typeof initialComme
 
 export default function Home() {
   const [location, setLocation] = useLocation();
+  const [showChatStart, setShowChatStart] = useState(location === "/");
   const current = location === "/tasks" ? "tasks" : location === "/youtube-agent" ? "youtube-agent" : location === "/content" ? "content" : location === "/production" ? "production" : location === "/publishing" ? "publishing" : location === "/analytics" ? "analytics" : "overview";
   const [range, setRange] = useState("Last 30 days");
   const [comparison, setComparison] = useState("Previous period");
@@ -648,11 +650,13 @@ export default function Home() {
   const [showDetail, setShowDetail] = useState(false);
 
   const selectedCampaignData = useMemo(() => campaigns.find((item) => item.id === selectedCampaign), [campaigns, selectedCampaign]);
-  const navigate = (slug: string) => setLocation(slug === "overview" ? "/" : `/${slug}`);
+  const navigate = (slug: string) => { setShowChatStart(false); setLocation(slug === "overview" ? "/" : `/${slug}`); };
   const selectCampaign = (id: string) => { setSelectedCampaign(id); setShowDetail(true); };
-  const refresh = () => toast.success("Signal room refreshed", { description: "Latest activity is now in view." });
+  const refresh = () => toast.success("Summer workspace refreshed", { description: "Latest activity is now in view." });
   const exportData = () => { const csv = ["Campaign,Status,Profile views,Cost per view,Conversions", ...campaigns.map((item) => `${item.name},${item.status},${item.views},${item.cpv},${item.conversions}`)].join("\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "signal-room-campaigns.csv"; anchor.click(); URL.revokeObjectURL(url); toast.success("CSV exported"); };
   const clearFilters = () => { setCampaignFilter("All videos"); setChannel("All channels"); setAudience("All audiences"); };
+
+  if (showChatStart) return <AgentChatStart onOpenWorkspace={() => setShowChatStart(false)} />;
 
   return <div className="app-shell"><Sidebar current={current} onNavigate={navigate} /><main className="main-shell"><Topbar onRefresh={refresh} onExport={exportData} range={range} setRange={setRange} comparison={comparison} setComparison={setComparison} /><div className="mobile-workspace-nav">{workspaceItems.map(({ slug, label, icon: Icon }) => <button key={slug} className={current === slug ? "active" : ""} onClick={() => navigate(slug)}><Icon size={15} /> {label}</button>)}</div><div className="page-content">{current === "overview" && <><div className="filter-bar-wrap"><FilterBar campaign={campaignFilter} setCampaign={setCampaignFilter} channel={channel} setChannel={setChannel} audience={audience} setAudience={setAudience} onClear={clearFilters} /></div><Overview onSelectCampaign={selectCampaign} campaigns={campaigns} channel={channel} campaignFilter={campaignFilter} /></>}{current === "tasks" && <Tasks tasks={tasks} setTasks={setTasks} />}{(current === "youtube-agent" || current === "content" || current === "production" || current === "publishing" || current === "analytics") && <YoutubeAgent comments={comments} setComments={setComments} />}</div></main>{showDetail && selectedCampaignData && <div className="modal-backdrop" onClick={() => setShowDetail(false)}><div className="modal-sheet" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowDetail(false)}><X size={18} /></button><CampaignDetail campaign={selectedCampaignData} /></div></div>}</div>;
 }
