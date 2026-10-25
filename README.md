@@ -1,14 +1,44 @@
-# Profile Growth & Campaign Performance
+# ProfileDash
 
-React / Express / tRPC / Drizzle starter, adapted from the Sandbox web-db-user template.
+ProfileDash is a campaign intelligence workspace for creator teams. It brings profile growth, campaign performance, and a YouTube research agent into one focused dashboard so teams can move from signal to action without stitching together spreadsheets.
 
-- `pnpm dev`: development server; honors `PORT` (default 3000).
-- `pnpm build` / `pnpm start`: build and serve `dist/index.js` and `dist/public/`.
-- `pnpm db:migrate`: apply checked-in migrations. `pnpm db:push`: generate and apply new schema changes.
-- `pnpm check` / `pnpm test`: types and application tests.
+![ProfileDash dashboard](docs/screenshots/dashboard.png)
 
-Start with the Webdev skill's default-template guide. Platform login, storage, payments and service contracts live in its shared references; read the relevant capability before extending its helper.
+## What is here
 
-`server/_core/publicConfig.ts` exposes only named public runtime values. Private keys stay server-side. The platform serves managed `/manus-storage/` assets; the application does not register a second proxy.
+- Profile and campaign performance views with responsive dark-mode UI.
+- YouTube agent workspace for research, comment sync, summaries, and follow-up tasks.
+- Server-backed tRPC APIs with Drizzle and Neon Postgres support.
+- Automated CI for typechecking and static production builds.
 
-Platform configuration is readable and editable through `webdev.config`. Default settings are initial values, not enforced constraints. The agent may modify the files, commands and configuration or follow the flexible guide for another stack.
+## Run locally
+
+```bash
+pnpm install --frozen-lockfile
+cp .env.example .env
+pnpm dev
+```
+
+The app honors `PORT` and defaults to `3000`.
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Start the full development server |
+| `pnpm build` | Build the client and bundled server |
+| `pnpm start` | Serve the production build |
+| `pnpm check` | Run TypeScript checks |
+| `pnpm test` | Run Vitest tests |
+| `pnpm build:static` | Build the static dashboard |
+| `pnpm db:migrate` | Apply checked-in database migrations |
+
+## Configuration and security
+
+`.env.example` documents the required runtime configuration without containing credentials. Copy it to `.env` for local development; `.env` and other environment files are ignored by Git. Private keys remain server-side and public runtime values are explicitly allowlisted in `server/_core/publicConfig.ts`.
+
+See [SECURITY.md](SECURITY.md) for the vulnerability reporting and secret-handling policy. The project is licensed under the [MIT License](LICENSE).
+
+## Status
+
+ProfileDash is an early-stage product under active development. The repository's CI workflow runs on pushes and pull requests to `main`; releases will be added once the core workflows are stable.
