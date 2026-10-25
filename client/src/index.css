@@ -717,3 +717,12 @@ h1 { max-width: 760px; margin-top: 9px; color: var(--ink); font-family: Georgia,
 .chat-suggestions button svg { margin-left: auto; color: #b9b0a8; }
 .chat-start-footnote { margin: 0 auto 24px; padding: 0 20px; color: var(--muted); font-size: 10px; text-align: center; }
 @media (max-width: 560px) { .chat-start-topbar { height: 60px; } .chat-start-content { margin-top: 10vh; } .chat-start-subtitle { font-size: 12px; } .chat-start-footnote { margin-bottom: 18px; } }
+
+.dark .chat-start-shell { background: radial-gradient(circle at 50% 8%, #25203f 0, var(--canvas) 38%); }
+.dark .chat-start-topbar { background: rgba(15,17,23,.82); border-color: var(--line); }
+.dark .chat-brand, .dark .chat-workspace-link, .dark .agent-composer textarea { color: var(--ink); }
+.dark .chat-start-subtitle, .dark .chat-workspace-link, .dark .agent-composer-footer, .dark .chat-start-footnote { color: var(--muted); }
+.dark .agent-composer, .dark .chat-suggestions button { background: var(--surface); border-color: var(--line); color: var(--ink-soft); }
+.dark .agent-composer { box-shadow: 0 18px 46px rgba(0,0,0,.25); }
+.dark .agent-composer-footer { border-color: var(--line); }
+.dark .chat-suggestions button:hover { background: var(--surface-soft); border-color: var(--line-strong); }
